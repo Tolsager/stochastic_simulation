@@ -2,6 +2,7 @@ from typing import *
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def chi_square_test(n_bins, random_numbers):
     # Chi-square test statistic for uniform distribution
     random_numbers = sorted(random_numbers)
@@ -15,7 +16,6 @@ def chi_square_test(n_bins, random_numbers):
     return chi_square
 
 
-
 def kolmogorov_smirnov_test(samples: Iterable, plot: bool = False) -> float:
     sorted_samples = sorted(samples)
     n = len(sorted_samples)
@@ -27,16 +27,15 @@ def kolmogorov_smirnov_test(samples: Iterable, plot: bool = False) -> float:
             i += 1
         Fs.append(i / n)
 
-
-
     if plot:
         plt.plot(xs, xs)
         plt.plot(xs, Fs)
         plt.show()
+
     return max(np.abs(np.array(Fs) - xs))
 
 
-def up_down_run_test(random_numbers):
+def knuth_up_down_run_test(random_numbers: Iterable):
     R = np.array([0, 0, 0, 0, 0, 0])
     run_length = 1
     n = len(random_numbers)
@@ -59,3 +58,45 @@ def up_down_run_test(random_numbers):
     Z = 1 / (n - 6) * (R - n * B) @ A @ (R - n * B)
 
     return Z
+
+
+def up_down_run_test(random_numbers: Iterable):
+    runs = []
+    up_length = 1
+    down_length = 1
+    n = len(random_numbers)
+    i = 1
+    down = False
+    up = False
+    for i in range(1, n):
+        if random_numbers[i] > random_numbers[i - 1]: # Going up
+            if down:
+                runs.append(down_length)
+                down_length = 1
+                down = False
+            up = True
+            up_length += 1
+        else: # Going down
+            if up:
+                runs.append(up_length)
+                up_length = 1
+                up = False
+            down = True
+            down_length += 1
+        if i == n - 1:
+            if up:
+                runs.append(up_length)
+            if down:
+                runs.append(down_length)
+
+    num_runs = len(runs)
+    test_stat = (num_runs - (2*n-1)/3) / np.sqrt((16*n-29)/90)
+    return test_stat
+
+
+def correlation_test(random_numbers: Iterable, h: int):
+    n = len(random_numbers)
+
+    c = sum([random_numbers[i]*random_numbers[i+h] for i in range(n-h)]) / (n-h)
+
+    return c
