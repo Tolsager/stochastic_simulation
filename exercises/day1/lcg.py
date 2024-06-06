@@ -1,6 +1,6 @@
 import random
 import matplotlib.pyplot as plt
-from stat_tests import chi_square_test, kolmogorov_smirnov_test
+from stat_tests import chi_square_test, kolmogorov_smirnov_test, above_below_test
 
 from scipy.stats import chi2
 
@@ -23,20 +23,28 @@ if __name__ == '__main__':
     size = 10000
     random_numbers = lcg(seed, multiplier, shift, modulus, size)
 
+    ### Uniformity tests ###
     # plt.hist(random_numbers, bins=10, edgecolor='black', width=0.09)
     # plt.show()
-
     # test_stat = chi_square_test(10, random_numbers)
-    ks_test_stat = kolmogorov_smirnov_test(random_numbers, plot=True)
+    # print(test_stat)
+    # ks_test_stat = kolmogorov_smirnov_test(random_numbers, plot=True)
 
-    test_stat = chi_square_test(10, random_numbers)
-    print(test_stat)
+    ### Correlation tests ###
+    # plt.scatter(random_numbers[:100], random_numbers[1:101])
+    # plt.show()
 
-    # Degrees of freedom = n_bins - 1
-    dof = 10 - 1
-    # Significance level
-    alpha = 0.05
-    critical_value = chi2.ppf(1 - alpha, dof)
+    # # Degrees of freedom = n_bins - 1
+    # dof = 10 - 1
+    # # Significance level
+    # alpha = 0.05
+    # critical_value = chi2.ppf(1 - alpha, dof)
 
-    print(critical_value > test_stat)
+    # print(critical_value > test_stat)
+
+    # above belov test
+    T_ab, p_ab = above_below_test(random_numbers)
+    print("Test statistic: ", T_ab)
+    print("P value: ", p_ab)
+
     
