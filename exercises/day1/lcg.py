@@ -1,6 +1,6 @@
 import random
 import matplotlib.pyplot as plt
-from stat_tests import chi_square_test, kolmogorov_smirnov_test, above_below_test
+from stat_tests import chi_square_test, kolmogorov_smirnov_test, knuth_up_down_run_test, up_down_run_test, correlation_test, above_below_test
 
 from scipy.stats import chi2
 
@@ -47,4 +47,8 @@ if __name__ == '__main__':
     print("Test statistic: ", T_ab)
     print("P value: ", p_ab)
 
-    
+    # print(critical_value > test_stat)
+
+    print(up_down_run_test(random_numbers))
+    print(knuth_up_down_run_test(random_numbers))
+    print(correlation_test(random_numbers, 5))
