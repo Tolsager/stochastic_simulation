@@ -1,6 +1,6 @@
 import random
 import matplotlib.pyplot as plt
-from stat_tests import chi_square_test
+from stat_tests import chi_square_test, kolmogorov_smirnov_test
 
 from scipy.stats import chi2
 
@@ -22,9 +22,11 @@ if __name__ == '__main__':
     modulus = 2**32
     size = 10000
     random_numbers = lcg(seed, multiplier, shift, modulus, size)
-    print(random_numbers)
+    # print(random_numbers)
 
-    plt.hist(random_numbers, bins=10, edgecolor='black', width=0.09)
-    plt.show()
+    # plt.hist(random_numbers, bins=10, edgecolor='black', width=0.09)
+    # plt.show()
 
-    test_stat = chi_square_test(10, random_numbers)
+    # test_stat = chi_square_test(10, random_numbers)
+    ks_test_stat = kolmogorov_smirnov_test(random_numbers, plot=True)
+

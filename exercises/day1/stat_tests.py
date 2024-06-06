@@ -1,3 +1,7 @@
+from typing import *
+import matplotlib.pyplot as plt
+import numpy as np
+
 def chi_square_test(n_bins, random_numbers):
     random_numbers = sorted(random_numbers)
     n = len(random_numbers)
@@ -15,5 +19,21 @@ def chi_square_test(n_bins, random_numbers):
 
 
 
-def kolmogorov_smirnov_test():
-    pass
+def kolmogorov_smirnov_test(samples: Iterable, plot: bool = False) -> float:
+    sorted_samples = sorted(samples)
+    n = len(sorted_samples)
+    xs = np.linspace(0, 1, 1000)
+    i = 0
+    Fs = []
+    for x in xs:
+        while (i < n) and (sorted_samples[i] <= x):
+            i += 1
+        Fs.append(i / n)
+
+
+
+    if plot:
+        plt.plot(xs, xs)
+        plt.plot(xs, Fs)
+        plt.show()
+    return max(np.abs(np.array(Fs) - xs))
