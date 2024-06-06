@@ -24,28 +24,47 @@ if __name__ == '__main__':
     random_numbers = lcg(seed, multiplier, shift, modulus, size)
 
     # Histogram
-    # plt.hist(random_numbers, bins=10, edgecolor='black', width=0.09)
-    # plt.show()
+    plt.hist(random_numbers, bins=10, edgecolor='black', width=0.09)
+    plt.show()
 
     # Scatter plot
-    # plt.scatter(random_numbers[:100], random_numbers[1:101])
-    # plt.show()
+    plt.scatter(random_numbers[:100], random_numbers[1:101])
+    plt.show()
 
     # Chi-square test
-    chi2_test_stat = chi_square_test(random_numbers, 10)
+    chi2_test_stat, p = chi_square_test(random_numbers, 10)
+    print("Chi-square")
+    print("T: ", chi2_test_stat)
+    print("p: ", p)
 
     # Kolmogorov-Smirnov test
-    ks_test_stat = kolmogorov_smirnov_test(random_numbers, plot=True)
+    ks_test_stat, p = kolmogorov_smirnov_test(random_numbers, plot=True)
+    print("Kolmogorov Smirnov")
+    print("T: ", ks_test_stat)
+    print("p: ", p)
 
     # Run tests
     # Run test 1 - Above below test
     T_ab, p_ab = above_below_test(random_numbers)
+    print("Above below")
     print("Test statistic: ", T_ab)
     print("P value: ", p_ab)
+
     # Run test 2
-    print(knuth_up_down_run_test(random_numbers))
+    T, p = knuth_up_down_run_test(random_numbers)
+    print("Knuth up-down")
+    print("Test statistic: ", T)
+    print("P value: ", p)
+
     # Run test 3
-    print(up_down_run_test(random_numbers))
+    T, p = up_down_run_test(random_numbers)
+    print("Up down test")
+    print("Test statistic: ", T)
+    print("P value: ", p)
 
     # Correlation test
-    print(correlation_test(random_numbers, h=5))
+    T, p = correlation_test(random_numbers, h=5)
+    print("Correlation test")
+    print("Test statistic: ", T)
+    print("P value: ", p)
+
