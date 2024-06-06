@@ -10,11 +10,15 @@ def chi_square_test(random_numbers: Iterable, n_bins: int) -> tuple[float, float
     # Chi-square test statistic for uniform distribution
     random_numbers = sorted(random_numbers)
     n = len(random_numbers)
-    bin_size = n // n_bins
-    bins = [random_numbers[i*bin_size:(i+1)*bin_size] for i in range(n_bins)]
+    k = 0
+    bins = [[] for _ in range(n_bins)]
+    for j, i in enumerate(np.linspace(0.1, 1, n_bins)):
+        while k < n and random_numbers[k] < i:
+            bins[j].append(random_numbers[k])
+            k += 1
 
     expected = n / n_bins
-    test_statistic = sum([(len(bin) - expected)**2 / expected for bin in bins])
+    test_statistic = sum([((len(bin) - expected)**2) / expected for bin in bins])
 
     p_val = 1 - chi2.cdf(test_statistic, n_bins - 1)
 
@@ -54,18 +58,18 @@ def above_below_test(samples: Iterable) -> tuple[float, float]:
         if above[i] == 1 and above[i-1] == 0:
             Ra += 1
     
-    Rb = 1 - above[0]
+    Rb = below[0]
     for i in range(1, n):
-        if above[i] == 0 and above[i] == 1:
+        if below[i] == 1 and below[i-1] == 0:
             Rb += 1
 
     T = Ra + Rb
     mean = 2 * (n1*n2) / (n1 + n2) + 1
     var = 2 * (n1*n2*(2*n1*n2-n1-n2)) / ((n1+n2)**2 * (n1+n2-1))
     if T < mean:
-        p_val = scipy.stats.norm.cdf(T, mean, np.sqrt(var)) * 2
+        p_val = norm.cdf(T, mean, np.sqrt(var)) * 2
     else:
-        p_val = (1 - scipy.stats.norm.cdf(T, mean, np.sqsrt(var))) * 2
+        p_val = (1 - norm.cdf(T, mean, np.sqrt(var))) * 2
 
     return T, p_val
 
@@ -92,7 +96,7 @@ def knuth_up_down_run_test(random_numbers: Iterable) -> tuple[float, float]:
 
     Z = 1 / (n - 6) * (R - n * B) @ A @ (R - n * B)
 
-    p_val = 1 - scipy.stats.chi2.cdf(Z, 6)
+    p_val = 1 - chi2.cdf(Z, 6)
 
     return Z, p_val
 
@@ -130,9 +134,9 @@ def up_down_run_test(random_numbers: Iterable) -> tuple[float, float]:
     test_stat = (num_runs - (2*n-1)/3) / np.sqrt((16*n-29)/90)
 
     if test_stat < 0:
-        p_val = scipy.stats.norm.cdf(test_stat) * 2
+        p_val = norm.cdf(test_stat) * 2
     else:
-        p_val = (1 - scipy.stats.norm.cdf(test_stat)) * 2
+        p_val = (1 - norm.cdf(test_stat)) * 2
 
     return test_stat, p_val
 
@@ -143,8 +147,8 @@ def correlation_test(random_numbers: Iterable, h: int) -> tuple[float, float]:
     c = sum([random_numbers[i]*random_numbers[i+h] for i in range(n-h)]) / (n-h)
 
     if c < 0.25:
-        p_val = 2 * scipy.stats.norm.cdf(c, 0.25, 7/(144*n))
+        p_val = 2 * norm.cdf(c, 0.25, np.sqrt(7/(144*n)))
     else:
-        p_val = 2 * (1 - scipy.stats.norm.cdf(c, 0.25, 7/(144*n)))
+        p_val = 2 * (1 - norm.cdf(c, 0.25, np.sqrt(7/(144*n))))
 
     return c, p_val
