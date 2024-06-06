@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def chi_square_test(n_bins, random_numbers):
+def chi_square_test(random_numbers: Iterable, n_bins: int) -> float:
     # Chi-square test statistic for uniform distribution
     random_numbers = sorted(random_numbers)
     n = len(random_numbers)
@@ -11,9 +11,9 @@ def chi_square_test(n_bins, random_numbers):
     bins = [random_numbers[i*bin_size:(i+1)*bin_size] for i in range(n_bins)]
 
     expected = n / n_bins
-    chi_square = sum([(len(bin) - expected)**2 / expected for bin in bins])
+    test_statistic = sum([(len(bin) - expected)**2 / expected for bin in bins])
 
-    return chi_square
+    return test_statistic
 
 
 def kolmogorov_smirnov_test(samples: Iterable, plot: bool = False) -> float:
@@ -35,7 +35,7 @@ def kolmogorov_smirnov_test(samples: Iterable, plot: bool = False) -> float:
     return max(np.abs(np.array(Fs) - xs))
 
 
-def knuth_up_down_run_test(random_numbers: Iterable):
+def knuth_up_down_run_test(random_numbers: Iterable) -> float:
     R = np.array([0, 0, 0, 0, 0, 0])
     run_length = 1
     n = len(random_numbers)
@@ -60,7 +60,7 @@ def knuth_up_down_run_test(random_numbers: Iterable):
     return Z
 
 
-def up_down_run_test(random_numbers: Iterable):
+def up_down_run_test(random_numbers: Iterable) -> float:
     runs = []
     up_length = 1
     down_length = 1
@@ -94,7 +94,7 @@ def up_down_run_test(random_numbers: Iterable):
     return test_stat
 
 
-def correlation_test(random_numbers: Iterable, h: int):
+def correlation_test(random_numbers: Iterable, h: int) -> float:
     n = len(random_numbers)
 
     c = sum([random_numbers[i]*random_numbers[i+h] for i in range(n-h)]) / (n-h)
