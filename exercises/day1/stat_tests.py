@@ -34,3 +34,28 @@ def kolmogorov_smirnov_test(samples: Iterable, plot: bool = False) -> float:
         plt.plot(xs, Fs)
         plt.show()
     return max(np.abs(np.array(Fs) - xs))
+
+
+def up_down_run_test(random_numbers):
+    R = np.array([0, 0, 0, 0, 0, 0])
+    run_length = 1
+    n = len(random_numbers)
+    for i in range(1, n):
+        if random_numbers[i] > random_numbers[i - 1]:
+            run_length += 1
+        else:
+            R[min(run_length, 6) - 1] += 1
+            run_length = 1
+
+    B = np.array([1 / 6, 5 / 24, 11 / 120, 19 / 720, 29 / 5040, 1 / 840])
+
+    A = np.array([[4529.4, 9044.9, 13568, 18091, 22615, 27892],
+                  [9044.9, 18097, 27139, 36187, 45234, 55789],
+                  [13568, 27139, 40721, 54281, 67852, 83685],
+                  [18091, 36187, 54281, 72414, 90470, 111580],
+                  [22615, 45234, 67852, 90470, 113262, 139476],
+                  [27892, 55789, 83685, 111580, 139476, 172860]])
+
+    Z = 1 / (n - 6) * (R - n * B) @ A @ (R - n * B)
+
+    return Z

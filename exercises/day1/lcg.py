@@ -1,6 +1,6 @@
 import random
 import matplotlib.pyplot as plt
-from stat_tests import chi_square_test, kolmogorov_smirnov_test
+from stat_tests import chi_square_test, kolmogorov_smirnov_test, up_down_run_test
 
 from scipy.stats import chi2
 
@@ -39,4 +39,5 @@ if __name__ == '__main__':
     critical_value = chi2.ppf(1 - alpha, dof)
 
     print(critical_value > test_stat)
-    
+
+    print(up_down_run_test(random_numbers))
