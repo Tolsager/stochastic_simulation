@@ -28,6 +28,8 @@ if __name__ == '__main__':
     # plt.show()
 
     # Scatter plot
+    # plt.scatter(random_numbers[:100], random_numbers[1:101])
+    # plt.show()
 
     # Chi-square test
     chi2_test_stat = chi_square_test(random_numbers, 10)
@@ -36,12 +38,14 @@ if __name__ == '__main__':
     ks_test_stat = kolmogorov_smirnov_test(random_numbers, plot=True)
 
     # Run tests
-    # Run test 1
-    print(above_below_test(random_numbers))
+    # Run test 1 - Above below test
+    T_ab, p_ab = above_below_test(random_numbers)
+    print("Test statistic: ", T_ab)
+    print("P value: ", p_ab)
     # Run test 2
     print(knuth_up_down_run_test(random_numbers))
     # Run test 3
     print(up_down_run_test(random_numbers))
 
     # Correlation test
-    print(correlation_test(random_numbers, h=1))
+    print(correlation_test(random_numbers, h=5))
