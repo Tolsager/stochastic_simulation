@@ -3,8 +3,10 @@ import scipy
 import matplotlib.pyplot as plt
 import numpy as np
 
+from scipy.stats import chi2, norm
 
-def chi_square_test(random_numbers: Iterable, n_bins: int) -> float:
+
+def chi_square_test(random_numbers: Iterable, n_bins: int) -> tuple[float, float]:
     # Chi-square test statistic for uniform distribution
     random_numbers = sorted(random_numbers)
     n = len(random_numbers)
@@ -14,7 +16,9 @@ def chi_square_test(random_numbers: Iterable, n_bins: int) -> float:
     expected = n / n_bins
     test_statistic = sum([(len(bin) - expected)**2 / expected for bin in bins])
 
-    return test_statistic
+    p_val = 1 - chi2.cdf(test_statistic, n_bins - 1)
+
+    return test_statistic, p_val
 
 
 
@@ -66,7 +70,7 @@ def above_below_test(samples: Iterable) -> tuple[float, float]:
     return T, p_val
 
 
-def knuth_up_down_run_test(random_numbers: Iterable) -> float:
+def knuth_up_down_run_test(random_numbers: Iterable) -> tuple[float, float]:
     R = np.array([0, 0, 0, 0, 0, 0])
     run_length = 1
     n = len(random_numbers)
@@ -88,10 +92,12 @@ def knuth_up_down_run_test(random_numbers: Iterable) -> float:
 
     Z = 1 / (n - 6) * (R - n * B) @ A @ (R - n * B)
 
-    return Z
+    p_val = 1 - scipy.stats.chi2.cdf(Z, 6)
+
+    return Z, p_val
 
 
-def up_down_run_test(random_numbers: Iterable) -> float:
+def up_down_run_test(random_numbers: Iterable) -> tuple[float, float]:
     runs = []
     up_length = 1
     down_length = 1
@@ -122,12 +128,23 @@ def up_down_run_test(random_numbers: Iterable) -> float:
 
     num_runs = len(runs)
     test_stat = (num_runs - (2*n-1)/3) / np.sqrt((16*n-29)/90)
-    return test_stat
+
+    if test_stat < 0:
+        p_val = scipy.stats.norm.cdf(test_stat) * 2
+    else:
+        p_val = (1 - scipy.stats.norm.cdf(test_stat)) * 2
+
+    return test_stat, p_val
 
 
-def correlation_test(random_numbers: Iterable, h: int) -> float:
+def correlation_test(random_numbers: Iterable, h: int) -> tuple[float, float]:
     n = len(random_numbers)
 
     c = sum([random_numbers[i]*random_numbers[i+h] for i in range(n-h)]) / (n-h)
 
-    return c
+    if c < 0.25:
+        p_val = 2 * scipy.stats.norm.cdf(c, 0.25, 7/(144*n))
+    else:
+        p_val = 2 * (1 - scipy.stats.norm.cdf(c, 0.25, 7/(144*n)))
+
+    return c, p_val
