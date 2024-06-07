@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scipy.stats import norm, expon, pareto, chi2
+from scipy.stats import norm, expon, pareto, chi2, kstest
 
 
 def box_mueller(n: int) -> np.ndarray:
@@ -45,6 +45,7 @@ if __name__ == '__main__':
     for idx, k in enumerate(ks):
         pareto_rvs = _pareto(beta, k, n)
 
+        print(kstest(pareto_rvs, pareto(k, scale=beta).cdf))
         print(f"Beta: {beta}, k: {k}")
         print(f"Mean: {np.mean(pareto_rvs):.3f}, Variance: {np.var(pareto_rvs):.3f}")
         print(f"Theoretical mean: {k*beta/(k-1):.3f}, Theoretical variance: {beta**2 * (k / ((k-1)**2 * (k-2))):.3f}")
@@ -58,8 +59,11 @@ if __name__ == '__main__':
 
     z1, z2 = box_mueller(n//2)
 
+    z = np.concatenate((z1, z2))
+    print(f"Box Muller Normal distribution\nMean: {np.mean(z):.3f}, Variance: {np.var(z):.3f}")
+
     x = np.linspace(-4, 4, 100)
-    plt.hist(np.concatenate((z1, z2)), bins=50, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
+    plt.hist(z, bins=50, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
     plt.plot(x, norm.pdf(x), linewidth=2, color="orange")
     plt.show()
 
@@ -95,14 +99,14 @@ if __name__ == '__main__':
     # Pareto distribution with support [0, inf]
     # k = 1
     # beta = mu
-    mu = 7
+    mu = 1
     n = 10000
     u = np.random.random(n)
     pareto_rvs = mu / u - mu
 
     x = np.linspace(0, np.max(pareto_rvs), 500)
     plt.hist(pareto_rvs, bins=100, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
-    plt.plot(x, beta / (beta + x) ** 2, linewidth=1, alpha=0.3, color="orange")
+    plt.plot(x, mu / (mu + x) ** 2, linewidth=1, alpha=0.3, color="orange")
     plt.show()
 
 
