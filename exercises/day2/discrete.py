@@ -10,11 +10,18 @@ def kl_divergence(p: list, q: list) -> float:
     return np.sum([p[i]*np.log(p[i]/q[i]) for i in range(len(p))])
 
 
+def time_function(function, *args, iterations: int = 1000):
+    start = time.perf_counter()
+    for _ in range(iterations):
+        function(*args)
+    return (time.perf_counter() - start) / iterations
+
+
 if __name__ == '__main__':
     TIME = True
     timing_iterations = 1000
     p = 0.3
-    n = 500
+    n = 10000
 
     unif_rvs = np.random.random(n)
 
@@ -32,23 +39,19 @@ if __name__ == '__main__':
     # Generate the six-point distribution
     fig, ax = plt.subplots(1, 3, figsize=(13, 5))
 
-    start = time.perf_counter() if TIME else None
-    for _ in range(timing_iterations):
-        direct_six_point_dist = direct_sampling(unif_rvs, p)
-    if start is not None:
-        print(f"Direct sampling took {(time.perf_counter() - start)/timing_iterations:.3f} seconds")
+    if TIME:
+        direct_sampling_time = time_function(direct_sampling, unif_rvs, p)
+        rejection_sampling_time = time_function(rejection_sampling, p, n)
+        alias_sampling_time = time_function(alias_sampling, p, n)
 
-    start = time.perf_counter() if TIME else None
-    for _ in range(timing_iterations):
-        rejection_six_point_dist = rejection_sampling(p, n)
-    if start is not None:
-        print(f"Rejection sampling took {(time.perf_counter() - start)/timing_iterations:.3f} seconds")
+        print(f"Direct sampling average time: {direct_sampling_time:.4f} seconds")
+        print(f"Rejection sampling average time: {rejection_sampling_time:.4f} seconds")
+        print(f"Alias sampling average time: {alias_sampling_time:.4f} seconds")
 
-    start = time.perf_counter() if TIME else None
-    for _ in range(timing_iterations):
-        alias_six_point_dist = alias_sampling(p, n)
-    if start is not None:
-        print(f"Alias sampling took {(time.perf_counter() - start)/timing_iterations:.3f} seconds")
+
+    direct_six_point_dist = direct_sampling(unif_rvs, p)
+    rejection_six_point_dist = rejection_sampling(p, n)
+    alias_six_point_dist = alias_sampling(p, n)
 
     ax[0].hist(direct_six_point_dist, bins=range(1, 8), density=True, width=0.9, align='mid', rwidth=0.9)
     ax[1].hist(rejection_six_point_dist, bins=range(1, 8), density=True, width=0.9, align='mid', rwidth=0.9)
