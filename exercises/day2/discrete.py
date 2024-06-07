@@ -12,8 +12,9 @@ def kl_divergence(p: list, q: list) -> float:
 
 if __name__ == '__main__':
     TIME = True
+    timing_iterations = 1000
     p = 0.3
-    n = 10000
+    n = 500
 
     unif_rvs = np.random.random(n)
 
@@ -32,19 +33,22 @@ if __name__ == '__main__':
     fig, ax = plt.subplots(1, 3, figsize=(13, 5))
 
     start = time.perf_counter() if TIME else None
-    direct_six_point_dist = direct_sampling(unif_rvs, p)
+    for _ in range(timing_iterations):
+        direct_six_point_dist = direct_sampling(unif_rvs, p)
     if start is not None:
-        print(f"Direct sampling took {time.perf_counter() - start:.2f} seconds")
+        print(f"Direct sampling took {(time.perf_counter() - start)/timing_iterations:.3f} seconds")
 
     start = time.perf_counter() if TIME else None
-    rejection_six_point_dist = rejection_sampling(p, n)
+    for _ in range(timing_iterations):
+        rejection_six_point_dist = rejection_sampling(p, n)
     if start is not None:
-        print(f"Rejection sampling took {time.perf_counter() - start:.2f} seconds")
+        print(f"Rejection sampling took {(time.perf_counter() - start)/timing_iterations:.3f} seconds")
 
     start = time.perf_counter() if TIME else None
-    alias_six_point_dist = alias_sampling(p, n)
+    for _ in range(timing_iterations):
+        alias_six_point_dist = alias_sampling(p, n)
     if start is not None:
-        print(f"Alias sampling took {time.perf_counter() - start:.2f} seconds")
+        print(f"Alias sampling took {(time.perf_counter() - start)/timing_iterations:.3f} seconds")
 
     ax[0].hist(direct_six_point_dist, bins=range(1, 8), density=True, width=0.9, align='mid', rwidth=0.9)
     ax[1].hist(rejection_six_point_dist, bins=range(1, 8), density=True, width=0.9, align='mid', rwidth=0.9)
@@ -55,9 +59,7 @@ if __name__ == '__main__':
     direct_p = [direct_six_point_dist.count(i)/n for i in range(1, 7)]
     rejection_p = [rejection_six_point_dist.count(i)/n for i in range(1, 7)]
     alias_p = [alias_six_point_dist.count(i)/n for i in range(1, 7)]
-    print(f"KL-divergence between Direct and Rejection: {kl_divergence(direct_p, rejection_p)}")
-    print(f"KL-divergence between Direct and Alias: {kl_divergence(direct_p, alias_p)}")
-    print(f"KL-divergence between Rejection and Alias: {kl_divergence(rejection_p, alias_p)}")
+
     print(f"KL-divergence between True and Direct: {kl_divergence(p, direct_p)}")
     print(f"KL-divergence between True and Rejection: {kl_divergence(p, rejection_p)}")
     print(f"KL-divergence between True and Alias: {kl_divergence(p, alias_p)}")
