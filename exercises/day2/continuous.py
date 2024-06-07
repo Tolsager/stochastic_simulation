@@ -12,6 +12,12 @@ def box_mueller(n: int) -> np.ndarray:
     return np.array([z1, z2])
 
 
+def transform_normal(z: np.ndarray, mu: float, sigma: float):
+    # Transform the standard normal random variables to normal random variables
+    # sigma: standard deviation, mu: mean
+    return mu + sigma * z
+
+
 def exponential(lamb: float, n: int) -> np.ndarray:
     unif_rvs = np.random.random(n)
     return -np.log(unif_rvs) / lamb
@@ -25,12 +31,12 @@ def _pareto(beta: float, k: float, n: int) -> np.ndarray:
 if __name__ == '__main__':
     n: int = 10000
 
-    l = 0.5
-    exp_rvs = exponential(l, n)
+    lam = 0.5
+    exp_rvs = exponential(lam, n)
 
     x = np.linspace(0, np.max(exp_rvs), 500)
     plt.hist(exp_rvs, bins=50, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
-    plt.plot(x, expon.pdf(x, scale=1/l), linewidth=2, color="orange")
+    plt.plot(x, expon.pdf(x, scale=1/lam), linewidth=2, color="orange")
     plt.show()
 
     fig, ax = plt.subplots(1, 4, figsize=(18, 5))
@@ -43,9 +49,10 @@ if __name__ == '__main__':
         print(f"Mean: {np.mean(pareto_rvs):.3f}, Variance: {np.var(pareto_rvs):.3f}")
         print(f"Theoretical mean: {k*beta/(k-1):.3f}, Theoretical variance: {beta**2 * (k / ((k-1)**2 * (k-2))):.3f}")
         
-        x = np.linspace(0, np.max(pareto_rvs), 500)
+        x = np.linspace(beta, np.max(pareto_rvs), 500)
         ax[idx].hist(pareto_rvs, bins=100, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
-        ax[idx].plot(x, pareto.pdf(x, b=beta, scale=1/k), linewidth=2, color="orange")
+        # pdf of the pareto distribution: f(x) = k * beta^k / x^(k+1)
+        ax[idx].plot(x, (k * beta ** k) / (x ** (k+1)), linewidth=2, color="orange")
 
     plt.show()
 
@@ -60,7 +67,7 @@ if __name__ == '__main__':
     mean_samples = np.zeros((100, 2))
     var_samples = np.zeros((100, 2))
     for i in range(100):
-        z1, z2 = box_mueller(10 // 2)
+        z1, z2 = box_mueller(10 // 2) # Box Muller generates 2 samples at a time
         sample = np.concatenate((z1, z2))
 
         mean = np.mean(sample)
@@ -81,6 +88,24 @@ if __name__ == '__main__':
 
     print(f"Mean confidence intervals: {mean_samples.mean(axis=0)}")
     print(f"Variance confidence intervals: {var_samples.mean(axis=0)}")
+
+    # Use composition to sample from the Pareto distribution
+    # U = F(x) = 1 - (1 + X / mu)^(-1) = 1 - mu / (mu + X)
+    # U = 1 - mu / (mu + X) => mu + X = mu / (1 - U) => X = mu / (1 - U) - mu = mu / U - mu
+    # Pareto distribution with support [0, inf]
+    # k = 1
+    # beta = mu
+    mu = 7
+    n = 10000
+    u = np.random.random(n)
+    pareto_rvs = mu / u - mu
+
+    x = np.linspace(0, np.max(pareto_rvs), 500)
+    plt.hist(pareto_rvs, bins=100, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
+    plt.plot(x, beta / (beta + x) ** 2, linewidth=1, alpha=0.3, color="orange")
+    plt.show()
+
+
 
 
 

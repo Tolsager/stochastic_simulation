@@ -7,10 +7,6 @@ from scipy.stats import chi2
 
 def lcg(seed, multiplier, shift, modulus, size):
     random_numbers = [(seed := (multiplier * seed + shift) % modulus) / modulus for _ in range(size)]
-    # random_numbers = []
-    # for i in range(size):
-    #     seed = (multiplier * seed + shift) % modulus
-    #     random_numbers.append(seed / modulus)
 
     return random_numbers
 

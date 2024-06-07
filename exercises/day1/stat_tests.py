@@ -18,12 +18,11 @@ def chi_square_test(random_numbers: Iterable, n_bins: int) -> tuple[float, float
             k += 1
 
     expected = n / n_bins
-    test_statistic = sum([((len(bin) - expected)**2) / expected for bin in bins])
+    test_statistic = sum([((len(bin) - expected) ** 2) / expected for bin in bins])
 
     p_val = 1 - chi2.cdf(test_statistic, n_bins - 1)
 
     return test_statistic, p_val
-
 
 
 def kolmogorov_smirnov_test(samples: Iterable, plot: bool = False) -> tuple[float, float]:
@@ -41,10 +40,11 @@ def kolmogorov_smirnov_test(samples: Iterable, plot: bool = False) -> tuple[floa
         plt.plot(xs, xs)
         plt.plot(xs, Fs)
         plt.show()
-    
-    T =  max(np.abs(np.array(Fs) - xs))
-    p = scipy.special.kolmogorov(T*np.sqrt(n))
+
+    T = max(np.abs(np.array(Fs) - xs))
+    p = scipy.special.kolmogorov(T * np.sqrt(n))
     return T, p
+
 
 def above_below_test(samples: Iterable) -> tuple[float, float]:
     median = np.median(samples)
@@ -55,17 +55,17 @@ def above_below_test(samples: Iterable) -> tuple[float, float]:
     n2 = below.sum().astype(np.int64)
     Ra = above[0]
     for i in range(1, n):
-        if above[i] == 1 and above[i-1] == 0:
+        if above[i] == 1 and above[i - 1] == 0:
             Ra += 1
-    
+
     Rb = below[0]
     for i in range(1, n):
-        if below[i] == 1 and below[i-1] == 0:
+        if below[i] == 1 and below[i - 1] == 0:
             Rb += 1
 
     T = Ra + Rb
-    mean = 2 * (n1*n2) / (n1 + n2) + 1
-    var = 2 * (n1*n2*(2*n1*n2-n1-n2)) / ((n1+n2)**2 * (n1+n2-1))
+    mean = 2 * (n1 * n2) / (n1 + n2) + 1
+    var = 2 * (n1 * n2 * (2 * n1 * n2 - n1 - n2)) / ((n1 + n2) ** 2 * (n1 + n2 - 1))
     if T < mean:
         p_val = norm.cdf(T, mean, np.sqrt(var)) * 2
     else:
@@ -110,14 +110,14 @@ def up_down_run_test(random_numbers: Iterable) -> tuple[float, float]:
     down = False
     up = False
     for i in range(1, n):
-        if random_numbers[i] > random_numbers[i - 1]: # Going up
+        if random_numbers[i] > random_numbers[i - 1]:  # Going up
             if down:
                 runs.append(down_length)
                 down_length = 1
                 down = False
             up = True
             up_length += 1
-        else: # Going down
+        else:  # Going down
             if up:
                 runs.append(up_length)
                 up_length = 1
@@ -131,7 +131,7 @@ def up_down_run_test(random_numbers: Iterable) -> tuple[float, float]:
                 runs.append(down_length)
 
     num_runs = len(runs)
-    test_stat = (num_runs - (2*n-1)/3) / np.sqrt((16*n-29)/90)
+    test_stat = (num_runs - (2 * n - 1) / 3) / np.sqrt((16 * n - 29) / 90)
 
     if test_stat < 0:
         p_val = norm.cdf(test_stat) * 2
@@ -144,11 +144,11 @@ def up_down_run_test(random_numbers: Iterable) -> tuple[float, float]:
 def correlation_test(random_numbers: Iterable, h: int) -> tuple[float, float]:
     n = len(random_numbers)
 
-    c = sum([random_numbers[i]*random_numbers[i+h] for i in range(n-h)]) / (n-h)
+    c = sum([random_numbers[i] * random_numbers[i + h] for i in range(n - h)]) / (n - h)
 
     if c < 0.25:
-        p_val = 2 * norm.cdf(c, 0.25, np.sqrt(7/(144*n)))
+        p_val = 2 * norm.cdf(c, 0.25, np.sqrt(7 / (144 * n)))
     else:
-        p_val = 2 * (1 - norm.cdf(c, 0.25, np.sqrt(7/(144*n))))
+        p_val = 2 * (1 - norm.cdf(c, 0.25, np.sqrt(7 / (144 * n))))
 
     return c, p_val
