@@ -1,4 +1,5 @@
 import random
+import numpy as np
 import matplotlib.pyplot as plt
 from stat_tests import chi_square_test, kolmogorov_smirnov_test, above_below_test, knuth_up_down_run_test, up_down_run_test, correlation_test
 
@@ -14,10 +15,12 @@ def lcg(seed, multiplier, shift, modulus, size):
 def main(random_nums, correlation_order=1):
     # Histogram
     plt.hist(random_nums, bins=10, edgecolor='black', width=0.09)
+    plt.tight_layout()
     plt.show()
 
     # Scatter plot
     plt.scatter(random_nums[:100], random_nums[1:101])
+    plt.tight_layout()
     plt.show()
 
     # Chi-square test
@@ -69,6 +72,6 @@ if __name__ == '__main__':
 
         main(random_numbers)
 
-    python_random_numbers = [random.random() for _ in range(size)]
+    python_random_numbers = np.random.random(size)
     print("Python random")
     main(python_random_numbers)
