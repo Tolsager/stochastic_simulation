@@ -33,6 +33,9 @@ if __name__ == '__main__':
 
     lam = 0.5
     exp_rvs = exponential(lam, n)
+    print(f"Sample mean: {np.mean(exp_rvs):.3f}, Sample variance {np.var(exp_rvs):.3f}")
+    print(f"Theoretical mean: {1/lam:.3f}, Theoretical variance: {1/pow(lam, 2):.3f}")
+    print(kstest(exp_rvs, expon(scale=1/lam).cdf))
 
     x = np.linspace(0, np.max(exp_rvs), 500)
     plt.hist(exp_rvs, bins=50, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
@@ -61,6 +64,7 @@ if __name__ == '__main__':
 
     z = np.concatenate((z1, z2))
     print(f"Box Muller Normal distribution\nMean: {np.mean(z):.3f}, Variance: {np.var(z):.3f}")
+    print(kstest(z, norm().cdf))
 
     x = np.linspace(-4, 4, 100)
     plt.hist(z, bins=50, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
