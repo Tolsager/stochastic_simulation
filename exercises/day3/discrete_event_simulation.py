@@ -85,6 +85,7 @@ def simulate_blocking_system(n_servers: int, n_customers: int, server_class: Ser
 
     arrivals = arrival_function(*arrival_args)
     departures = []
+    service_times = []
     
     while n_arrivals < n_customers:
             T_A = arrivals[0]
@@ -100,6 +101,7 @@ def simulate_blocking_system(n_servers: int, n_customers: int, server_class: Ser
                         if not server:
                             service_time, departure_time = server.start_service(t)
                             departures.append((departure_time, i))
+                            service_times.append(service_time)
                             break
                     departures = sorted(departures, key=lambda x: x[0])
             else:
@@ -113,7 +115,7 @@ def simulate_blocking_system(n_servers: int, n_customers: int, server_class: Ser
             n_in_system.append(sum([s.occupied for s in servers]))
     
 
-    return n_served, n_blocked, (times, n_in_system)
+    return n_served, n_blocked, service_times, (times, n_in_system)
 
 
 if __name__ == '__main__':
@@ -127,6 +129,8 @@ if __name__ == '__main__':
     n_customers = 10_000
     
     total_blocked = []
+    blocked_probabilities = []
+    service_time_averages = []
 
     # Initialize the simulation
     n_simulations = 10
@@ -136,7 +140,7 @@ if __name__ == '__main__':
         # ServerConstant: args - (mean_service_time,)
         # ServerPareto: args - (k, beta, mean_service_time)
         # ServerHalfNormal: args - (mu, sigma, mean_service_time)
-        served, blocked, utilization_stats = simulate_blocking_system(n_servers=n_servers, 
+        served, blocked, service_times, utilization_stats = simulate_blocking_system(n_servers=n_servers, 
                                                                       n_customers=n_customers, 
                                                                       server_class = Server, 
                                                                       arrival_function=get_arrivals, 
@@ -144,12 +148,31 @@ if __name__ == '__main__':
                                                                       arrival_args=(n_customers, mean_interarrival_time)
                                                                       )
         
+        service_time_averages.append(np.mean(service_times))
+        blocked_probabilities.append(blocked/n_customers)
+        
+        
         total_blocked.append(blocked)
 
 
         # arrivals = get_arrivals_hyperexp(10_000, (0.8, 0.2), (0.8333, 5))
         # arrivals = get_arrivals(n_customers, mean_interarrival_time)
-        
+    
+    e_x = np.mean(blocked_probabilities)
+    e_y = mean_service_time
+
+    var_x = np.var(blocked_probabilities)
+    var_y = np.var(service_time_averages)
+
+
+    cov = np.multiply(blocked_probabilities, service_time_averages).mean() - e_x * e_y
+
+    c = -cov/var_y
+
+    Z = np.array(blocked_probabilities) - c*(np.array(service_time_averages) - e_y)
+
+    print(Z.mean(), (Z.mean() -1.96 * np.sqrt(Z.var()/10), Z.mean() + 1.96 * np.sqrt(Z.var()/10)))
+
     # print("Customers served: ", n_served)
     # print("Arrivals: ", n_arrivals)
     print("Average percentage of customers blocked: ", np.mean(total_blocked) / 100)
