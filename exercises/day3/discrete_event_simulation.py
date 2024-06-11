@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from collections import deque
+from typing import Callable
 
 from scipy.stats import norm
 import scipy.stats as stats
@@ -73,40 +74,19 @@ def get_arrivals_hyperexp(n: int, ps: tuple[float, float], lambdas: tuple[float,
     return deque([(time := time - np.log(np.random.random()) * 1/lambdas[0] if np.random.random() < ps[0] else time - np.log(np.random.random()) * 1/lambdas[1]) for _ in range(n)])
             
 
-if __name__ == '__main__':
-    # Blocking system with 10 servers and no waiting room
-    # Mean service time is 8 time units
-    # Mean time between arrivals is 1 time unit
-    # 10000 Customers
-    n_servers = 10
-    mean_service_time = 8
-    mean_interarrival_time = 1
-    n_customers = 10_000
+def simulate_blocking_system(n_servers: int, n_customers: int, server_class: Server, arrival_function: callable, server_args: tuple, arrival_args: tuple):
+    t = 0
+    n_served = 0
+    n_blocked = 0
+    n_in_system = []
+    n_arrivals = 0
+    times = []
+    servers = [server_class(*server_args) for _ in range(n_servers)]
+
+    arrivals = arrival_function(*arrival_args)
+    departures = []
     
-    total_blocked = []
-
-    # Initialize the simulation
-    n_simulations = 10
-    for j in range(n_simulations):
-        t = 0
-        n_served = 0
-        n_blocked = 0
-        n_in_system = []
-        n_arrivals = 0
-        utilization = []
-        times = []
-
-        # servers = [Server(mean_service_time) for _ in range(n_servers)]
-        # servers = [ServerConstant(mean_service_time) for _ in range(n_servers)]
-        # servers = [ServerPareto(21/20, 2/5, mean_service_time) for _ in range(n_servers)]
-        servers = [ServerHalfNormal(0, 8 * np.sqrt(np.pi) / np.sqrt(2), mean_service_time) for _ in range(n_servers)]
-
-        # arrivals = get_arrivals_hyperexp(10_000, (0.8, 0.2), (0.8333, 5))
-        arrivals = get_arrivals(n_customers, mean_interarrival_time)
-        departures = []
-
-
-        while n_arrivals < n_customers:
+    while n_arrivals < n_customers:
             T_A = arrivals[0]
             T_D = np.inf if len(departures) == 0 else departures[0][0]
 
@@ -131,7 +111,44 @@ if __name__ == '__main__':
             
             times.append(t)
             n_in_system.append(sum([s.occupied for s in servers]))
-        total_blocked.append(n_blocked)
+    
+
+    return n_served, n_blocked, (times, n_in_system)
+
+
+if __name__ == '__main__':
+    # Blocking system with 10 servers and no waiting room
+    # Mean service time is 8 time units
+    # Mean time between arrivals is 1 time unit
+    # 10000 Customers
+    n_servers = 10
+    mean_service_time = 8
+    mean_interarrival_time = 1
+    n_customers = 10_000
+    
+    total_blocked = []
+
+    # Initialize the simulation
+    n_simulations = 10
+    for j in range(n_simulations):
+        # Servers
+        # Server: args - (mean_service_time,)
+        # ServerConstant: args - (mean_service_time,)
+        # ServerPareto: args - (k, beta, mean_service_time)
+        # ServerHalfNormal: args - (mu, sigma, mean_service_time)
+        served, blocked, utilization_stats = simulate_blocking_system(n_servers=n_servers, 
+                                                                      n_customers=n_customers, 
+                                                                      server_class = Server, 
+                                                                      arrival_function=get_arrivals, 
+                                                                      server_args=(mean_service_time,), 
+                                                                      arrival_args=(n_customers, mean_interarrival_time)
+                                                                      )
+        
+        total_blocked.append(blocked)
+
+
+        # arrivals = get_arrivals_hyperexp(10_000, (0.8, 0.2), (0.8333, 5))
+        # arrivals = get_arrivals(n_customers, mean_interarrival_time)
         
     # print("Customers served: ", n_served)
     # print("Arrivals: ", n_arrivals)
