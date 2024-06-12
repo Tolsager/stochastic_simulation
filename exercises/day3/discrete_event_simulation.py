@@ -141,10 +141,10 @@ if __name__ == '__main__':
         # ServerPareto: args - (k, beta, mean_service_time)
         # ServerHalfNormal: args - (mu, sigma, mean_service_time)
         served, blocked, service_times, utilization_stats = simulate_blocking_system(n_servers=n_servers, 
-                                                                      n_customers=n_customers, 
-                                                                      server_class = Server, 
-                                                                      arrival_function=get_arrivals, 
-                                                                      server_args=(mean_service_time,), 
+                                                                      n_customers=n_customers,
+                                                                      server_class = Server,
+                                                                      arrival_function=get_arrivals,
+                                                                      server_args=(mean_service_time,),
                                                                       arrival_args=(n_customers, mean_interarrival_time)
                                                                       )
         
@@ -157,21 +157,22 @@ if __name__ == '__main__':
 
         # arrivals = get_arrivals_hyperexp(10_000, (0.8, 0.2), (0.8333, 5))
         # arrivals = get_arrivals(n_customers, mean_interarrival_time)
-    
+
+    # X is the probability of being blocked
+    # Y is the mean service time
     e_x = np.mean(blocked_probabilities)
-    e_y = mean_service_time
+    e_y = np.mean(service_time_averages)
 
     var_x = np.var(blocked_probabilities)
     var_y = np.var(service_time_averages)
-
 
     cov = np.multiply(blocked_probabilities, service_time_averages).mean() - e_x * e_y
 
     c = -cov/var_y
 
-    Z = np.array(blocked_probabilities) - c*(np.array(service_time_averages) - e_y)
+    Z = np.array(blocked_probabilities) - c*(np.array(service_time_averages) - mean_service_time)
 
-    print(Z.mean(), (Z.mean() -1.96 * np.sqrt(Z.var()/10), Z.mean() + 1.96 * np.sqrt(Z.var()/10)))
+    print(Z.mean(), (Z.mean() -1.96 * np.sqrt(Z.var()/n_simulations), Z.mean() + 1.96 * np.sqrt(Z.var()/n_simulations)))
 
     # print("Customers served: ", n_served)
     # print("Arrivals: ", n_arrivals)
