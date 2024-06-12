@@ -268,34 +268,55 @@ def task2(subtask="a"):
         plt.show()
 
     elif subtask == "c":
-        samples = np.array(mc_hastings_two_queues.gibbs_sampler())
+        p_values = []
+        for _ in range(n_experiments):
+            mc_hastings_two_queues = MetropolisHastingsTwoQueues(n, m, x0, y0, A1, A2)
+            samples = np.array(mc_hastings_two_queues.gibbs_sampler())
 
-        fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+            # fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
-        plt.hist2d(samples[:,0], samples[:,1], bins=(range(12), range(12)))
-        plt.colorbar()
+            # plt.hist2d(samples[:,0], samples[:,1], bins=(range(12), range(12)))
+            # plt.colorbar()
+            # plt.show()
+
+            samples_post_warmup = samples[int(warm_up_fraction*n):]
+
+            observed = {(i, j): 0 for i in range(m+1) for j in range(m+1) if i+j <= m}
+            c = 1 / np.sum([pow(A1, i)/math.factorial(i) * pow(A2, j)/math.factorial(j) for i in range(m+1) for j in range(m+1) if i+j <= m])
+            expected = {}
+            for i in range(m+1):
+                for j in range(m+1):
+                    if i+j <= m:
+                        expected[(i, j)] = (n-n*warm_up_fraction)*(pow(A1, i)/math.factorial(i) * pow(A2, j)/math.factorial(j))*c
+
+            observed_freqs = np.zeros(66)
+            expected_freqs = np.zeros(66)
+            for i, k in enumerate(expected.keys()):
+                observed_freqs[i] = observed[k]
+                expected_freqs[i] = expected[k]
+
+            for sample in samples_post_warmup:
+                i, j = sample
+                observed[(i, j)] += 1
+
+            observed_freqs = np.zeros(66)
+            expected_freqs = np.zeros(66)
+            for i, k in enumerate(expected.keys()):
+                observed_freqs[i] = observed[k]
+                expected_freqs[i] = expected[k]
+
+            # plt.plot(expected_freqs, label='Expected')
+            # plt.plot(observed_freqs, label='Observed')
+            # plt.legend()
+            # plt.show()
+            
+            p_val = stats.chisquare(observed_freqs, expected_freqs, ddof=0).pvalue
+            p_values.append(p_val)
+        plt.hist(p_values)
+        plt.xlabel("p value")
+        plt.ylabel("count")
         plt.show()
 
-        samples_post_warmup = samples[int(warm_up_fraction*n):]
-
-        observed = {(i, j): 0 for i in range(m+1) for j in range(m+1) if i+j <= m}
-
-        for sample in samples_post_warmup:
-            i, j = sample
-            observed[(i, j)] += 1
-
-        observed_freqs = np.zeros(66)
-        expected_freqs = np.zeros(66)
-        for i, k in enumerate(expected.keys()):
-            observed_freqs[i] = observed[k]
-            expected_freqs[i] = expected[k]
-
-        plt.plot(expected_freqs, label='Expected')
-        plt.plot(observed_freqs, label='Observed')
-        plt.legend()
-        plt.show()
-        
-        print(stats.chisquare(observed_freqs, expected_freqs, ddof=0))
 
 
     
@@ -304,8 +325,7 @@ if __name__ == '__main__':
     # task1()
 
     ## Task 2
-    task2("b")
+    task2("c")
 
     ## Task 3
     
-
