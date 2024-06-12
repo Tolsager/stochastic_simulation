@@ -112,14 +112,14 @@ class MetropolisHastingsTwoQueues:
         x, y = self.x0, self.y0
         samples = [(x,y)]
 
-        c1 = 1 / np.sum([pow(self.A1, i)/math.factorial(i) for i in range(self.m+1)])
-        c2 = 1 / np.sum([pow(self.A2, j)/math.factorial(j) for j in range(self.m+1)])
-        c3 = 1 / np.sum([pow(self.A1, i)/math.factorial(i) * pow(self.A2, j)/math.factorial(j) for i in range(self.m+1) for j in range(self.m+1) if i+j <= self.m])
-
         for _ in range(self.n_iterations-1):
-            # Sample x given y
-            p_ij = np.array([pow(self.A1, i)/math.factorial(i) * c3/c2 for i in range(self.m+1) if i+y <= self.m])
-            
+            ps = [pow(self.A1, i) / math.factorial(i) / np.sum([pow(self.A1, j) / math.factorial(j) for j in range(self.m+1-y)]) for i in range(self.m+1-y)]
+
+            x = np.random.choice(self.m+1-y, p=ps)
+
+            ps = [pow(self.A2, i) / math.factorial(i) / np.sum([pow(self.A2, j) / math.factorial(j) for j in range(self.m+1-x)]) for i in range(self.m+1-x)]
+
+            y = np.random.choice(self.m+1-x, p=ps)
 
             samples.append((x, y))
         
