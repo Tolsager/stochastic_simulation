@@ -329,12 +329,6 @@ def task2(subtask="a"):
                     if i+j <= m:
                         expected[(i, j)] = (n-n*warm_up_fraction)*(pow(A1, i)/math.factorial(i) * pow(A2, j)/math.factorial(j))*c
 
-            observed_freqs = np.zeros(66)
-            expected_freqs = np.zeros(66)
-            for i, k in enumerate(expected.keys()):
-                observed_freqs[i] = observed[k]
-                expected_freqs[i] = expected[k]
-                
             for sample in samples_post_warmup:
                 i, j = sample
                 observed[(i, j)] += 1
