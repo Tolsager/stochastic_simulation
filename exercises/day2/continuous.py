@@ -33,6 +33,7 @@ if __name__ == '__main__':
 
     lam = 0.5
     exp_rvs = exponential(lam, n)
+    print("Exponential distribution")
     print(f"Sample mean: {np.mean(exp_rvs):.3f}, Sample variance {np.var(exp_rvs):.3f}")
     print(f"Theoretical mean: {1/lam:.3f}, Theoretical variance: {1/pow(lam, 2):.3f}")
     print(kstest(exp_rvs, expon(scale=1/lam).cdf))
@@ -40,16 +41,18 @@ if __name__ == '__main__':
     x = np.linspace(0, np.max(exp_rvs), 500)
     plt.hist(exp_rvs, bins=50, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
     plt.plot(x, expon.pdf(x, scale=1/lam), linewidth=2, color="orange")
+    plt.tight_layout()
     plt.show()
 
+    print("\nPareto distributions")
     fig, ax = plt.subplots(1, 4, figsize=(18, 5))
     ks = [2.05, 2.5, 3, 4]
     beta = 1
     for idx, k in enumerate(ks):
         pareto_rvs = _pareto(beta, k, n)
 
-        print(kstest(pareto_rvs, pareto(k, scale=beta).cdf))
         print(f"Beta: {beta}, k: {k}")
+        print(kstest(pareto_rvs, pareto(k, scale=beta).cdf))
         print(f"Mean: {np.mean(pareto_rvs):.3f}, Variance: {np.var(pareto_rvs):.3f}")
         print(f"Theoretical mean: {k*beta/(k-1):.3f}, Theoretical variance: {beta**2 * (k / ((k-1)**2 * (k-2))):.3f}")
         
@@ -57,7 +60,9 @@ if __name__ == '__main__':
         ax[idx].hist(pareto_rvs, bins=100, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
         # pdf of the pareto distribution: f(x) = k * beta^k / x^(k+1)
         ax[idx].plot(x, (k * beta ** k) / (x ** (k+1)), linewidth=2, color="orange")
+        ax[idx].set_title(f"Pareto distribution with k = {k}")
 
+    plt.tight_layout()
     plt.show()
 
     z1, z2 = box_mueller(n//2)
@@ -69,6 +74,7 @@ if __name__ == '__main__':
     x = np.linspace(-4, 4, 100)
     plt.hist(z, bins=50, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
     plt.plot(x, norm.pdf(x), linewidth=2, color="orange")
+    plt.tight_layout()
     plt.show()
 
     # 100 95% confidence intervals using 10 samples for the normal distribution
@@ -95,7 +101,11 @@ if __name__ == '__main__':
         var_samples[i] = var_bounds
 
     print(f"Mean confidence intervals: {mean_samples.mean(axis=0)}")
+    print(f"Variance of mean confidence interval bounds: {mean_samples.var(axis=0)}")
     print(f"Variance confidence intervals: {var_samples.mean(axis=0)}")
+    print(f"Variance of variance confidence interval bounds: {var_samples.var(axis=0)}")
+
+    
 
     # Use composition to sample from the Pareto distribution
     # U = F(x) = 1 - (1 + X / mu)^(-1) = 1 - mu / (mu + X)
