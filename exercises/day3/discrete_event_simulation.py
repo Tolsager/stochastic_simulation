@@ -1,4 +1,7 @@
 import numpy as np
+import random
+import os
+from typing import *
 import matplotlib.pyplot as plt
 
 from collections import deque
@@ -65,6 +68,11 @@ def get_arrivals(n: int, mean_interarrival_time):
     time: float = 0.0
     return deque([(time := time - np.log(np.random.random()) * mean_interarrival_time) for _ in range(n)])
 
+
+def seedBasic(seed=0):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
 def get_arrivals_Erlang(n: int, k: int):
     time: float = 0.0
     return deque([(time := time - (1/k) * np.sum([np.log(np.random.random()) for i in range(k)])) for _ in range(n)])
@@ -72,6 +80,10 @@ def get_arrivals_Erlang(n: int, k: int):
 def get_arrivals_hyperexp(n: int, ps: tuple[float, float], lambdas: tuple[float, float]):
     time: float = 0.0
     return deque([(time := time - np.log(np.random.random()) * 1/lambdas[0] if np.random.random() < ps[0] else time - np.log(np.random.random()) * 1/lambdas[1]) for _ in range(n)])
+
+def get_arrivals_hyperexp_crn(crn: Iterable, ps: tuple[float, float], lambdas: tuple[float, float]):
+    time: float = 0.0
+    return deque([(time := time - np.log(crn[i]) * 1/lambdas[0] if np.random.random() < ps[0] else time - np.log(crn[i]) * 1/lambdas[1]) for i in range(len(crn))])
             
 
 def simulate_blocking_system(n_servers: int, n_customers: int, server_class: Server, arrival_function: callable, server_args: tuple, arrival_args: tuple):
@@ -131,6 +143,9 @@ if __name__ == '__main__':
     total_blocked = []
     blocked_probabilities = []
     service_time_averages = []
+    seedBasic(3)
+    U = np.random.rand(n_customers)
+
 
     # Initialize the simulation
     n_simulations = 10
@@ -143,9 +158,9 @@ if __name__ == '__main__':
         served, blocked, service_times, utilization_stats = simulate_blocking_system(n_servers=n_servers, 
                                                                       n_customers=n_customers,
                                                                       server_class = Server,
-                                                                      arrival_function=get_arrivals,
+                                                                      arrival_function=get_arrivals_hyperexp_crn,
                                                                       server_args=(mean_service_time,),
-                                                                      arrival_args=(n_customers, mean_interarrival_time)
+                                                                      arrival_args=(U, (0.8, 0.2), (0.8333, 5))
                                                                       )
         
         service_time_averages.append(np.mean(service_times))
@@ -172,7 +187,7 @@ if __name__ == '__main__':
 
     Z = np.array(blocked_probabilities) - c*(np.array(service_time_averages) - mean_service_time)
 
-    print(Z.mean(), (Z.mean() -1.96 * np.sqrt(Z.var()/n_simulations), Z.mean() + 1.96 * np.sqrt(Z.var()/n_simulations)))
+    # print(Z.mean(), (Z.mean() -1.96 * np.sqrt(Z.var()/n_simulations), Z.mean() + 1.96 * np.sqrt(Z.var()/n_simulations)))
 
     # print("Customers served: ", n_served)
     # print("Arrivals: ", n_arrivals)

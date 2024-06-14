@@ -102,7 +102,7 @@ if __name__ == "__main__":
     prior = sample_prior(1)
     m = prior[0]
     v = prior[1]
-    # print(np.array2string(prior, precision=3))
+    print(np.array2string(prior, precision=3))
 
     fig, axes = plt.subplots(1, 3, figsize=(16, 6))
 
@@ -117,7 +117,7 @@ if __name__ == "__main__":
         ## d)
         sample_mean = likelihood.mean()
         sample_var = likelihood.var()
-        # print(sample_mean, sample_var)
+        print(sample_mean, sample_var)
         x0 = (sample_mean, sample_var)
         v1 = 1 / 4
         v2 = 1 / 4

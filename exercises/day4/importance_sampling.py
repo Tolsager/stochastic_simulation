@@ -28,16 +28,18 @@ def IS_exp(n: int, l: float):
     g = lambda x: l*np.exp(-l*x)
     h = lambda x: np.exp(x)
 
-    # since f is the uniform distribution, the density function for f is always 1 for 0 < x < 1
     estimates = []
     for i in range(n):
-        u = np.random.rand()
-        estimates.append(h(u)/g(u))
+        x = stats.expon.rvs(scale=1/l)
+        if 0 < x and x < 1:
+            estimates.append(h(x)/g(x))
+        else:
+            estimates.append(0)
     return np.mean(estimates)
 
 def find_lambda():
     def f(l):
-        return 1/l**2 * (1/(1+l)*np.exp(2+2*l) - 1/(2+l)) - 1/(l+l**2)**2*(np.exp(1+l)+1)**2
+        return 1/(2*l+l**2)*(np.exp(2+l) - 1)-(np.exp(1)-1)**2
     res = scipy.optimize.minimize_scalar(f)
     return res
     
@@ -45,21 +47,29 @@ def find_lambda():
 
 if __name__ == "__main__":
     # Task 7
-    a = 3
-    print("Task 7")
-    print("Crude MC Estimator")
-    n = 10000
-    p_MC = crude_MC_estimator(n, a)
-    print(f"p(Z>a) = {p_MC:.3f}")
-    print()
+    # a = 3
+    # print("Task 7")
+    # print("Crude MC Estimator")
+    # n = 10000
+    # p_MC = crude_MC_estimator(n, a)
+    # print(f"p(Z>a) = {p_MC:.3f}")
+    # print()
 
-    print("IS")
-    var = 1
-    p_IS = IS_norm(n, a, var)
-    print(f"p(Z>a) = {p_IS:.3f}")
-    print()
+    # print("IS")
+    # var = 1
+    # p_IS = IS_norm(n, a, var)
+    # print(f"p(Z>a) = {p_IS:.3f}")
+    # print()
 
     
+    # task 8
+    res = find_lambda()
+    l = res.x
+    n = 10_000
+    val = IS_exp(n, l)
+    print(val)
+    # print(res)
+
 
     
 

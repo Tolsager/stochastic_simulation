@@ -123,10 +123,3 @@ if __name__ == '__main__':
     plt.plot(x, mu / (mu + x) ** 2, linewidth=1, alpha=0.3, color="orange")
     plt.show()
 
-
-
-
-
-
-
-
