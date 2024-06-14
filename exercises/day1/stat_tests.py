@@ -39,6 +39,7 @@ def kolmogorov_smirnov_test(samples: Iterable, plot: bool = False) -> tuple[floa
     if plot:
         plt.plot(xs, xs)
         plt.plot(xs, Fs)
+        plt.tight_layout()
         plt.show()
 
     T = max(np.abs(np.array(Fs) - xs))

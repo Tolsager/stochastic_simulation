@@ -18,9 +18,9 @@ def rejection_sampling(p: list, n: int) -> list:
     dist = []
     for _ in range(n):
         while True:
-            u1 = random.random()
+            u1 = np.random.rand()
             i = np.floor(u1 * k).astype(np.int8)
-            if random.random() < p[i] / c:
+            if np.random.rand() < p[i] / c:
                 dist.append(i + 1)
                 break
     return dist
@@ -43,9 +43,9 @@ def alias_sampling(p: list, n: int) -> list:
         s = np.delete(s, 0)
     dist = []
     for _ in range(n):
-        u1 = random.random()
+        u1 = np.random.rand()
         i = np.floor(u1 * k).astype(np.int8)
-        if random.random() < f[i]:
+        if np.random.rand() < f[i]:
             dist.append(i + 1)
         else:
             dist.append(l[i] + 1)
