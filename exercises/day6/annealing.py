@@ -74,6 +74,7 @@ def get_simplex_stations(n_stations: int, max_c: float):
 
     
 
+
 if __name__ == "__main__":
     n_stations = 10
     n_iterations = 10_000
