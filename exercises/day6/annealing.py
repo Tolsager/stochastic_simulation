@@ -40,7 +40,7 @@ class Annealing:
             
             samples.append(x)
         
-            T = 1 / np.sqrt(2 + i)
+            T = 1 / np.sqrt(2+i)
         return samples
     
 class Annealing_EC(Annealing):
@@ -54,10 +54,6 @@ class Annealing_EC(Annealing):
             total_cost += np.linalg.norm(stations[x[i+1]] - stations[x[i]])
         total_cost += np.linalg.norm(stations[x[0]] - stations[x[-1]])
         return total_cost
-
-
-
-    
 
 
 def get_circle_stations(n_stations: int, r: float):
@@ -115,7 +111,10 @@ if __name__ == "__main__":
     plt.show()
 
 
+    cost_matrix = np.loadtxt("exercises/day6/cost.csv", delimiter=",")
 
+    plt.matshow(cost_matrix)
+    plt.show()
 
 
 
