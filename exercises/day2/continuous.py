@@ -113,14 +113,18 @@ if __name__ == '__main__':
     # Pareto distribution with support [0, inf]
     # k = 1
     # beta = mu
-    mu = 1
-    n = 10000
-    u = np.random.random(n)
-    pareto_rvs = mu / u - mu
 
-    x = np.linspace(0, np.max(pareto_rvs), 500)
-    plt.hist(pareto_rvs, bins=100, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
-    plt.plot(x, mu / (mu + x) ** 2, linewidth=1, alpha=0.3, color="orange")
+    mu = 1
+    n = 1000
+
+    y = exponential(mu, n)
+
+    x = exponential(y, n)
+
+    x = x[x < 20]
+
+    plt.hist(x, bins=50, density=True, rwidth=0.8, color="dodgerblue", edgecolor="black")
+    plt.plot(np.linspace(0, x.max(), 100), mu / (mu + np.linspace(0, x.max(), 100)) ** 2, linewidth=1, alpha=0.7, color="orange")
     plt.show()
 
 
