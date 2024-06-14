@@ -21,7 +21,7 @@ if __name__ == '__main__':
     TIME = True
     timing_iterations = 100
     p = 0.3
-    n = 100
+    n = 10000
 
     unif_rvs = np.random.random(n)
 

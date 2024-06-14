@@ -11,6 +11,7 @@ class Annealing:
         self.n = n
         self.T0 = T0
         self.A = A
+        self.temp = temp
 
     def h(self, x: Iterable):
         to_swap = np.random.choice(self.n, size=2, replace=False)
@@ -40,7 +41,7 @@ class Annealing:
             
             samples.append(x)
         
-            T = 1 / np.sqrt(2 + i)
+            T = 1 / np.sqrt(2+i)
         return samples
     
 class Annealing_EC(Annealing):
@@ -56,15 +57,11 @@ class Annealing_EC(Annealing):
         return total_cost
 
 
-
-    
-
-
 def get_circle_stations(n_stations: int, r: float):
     thetas = np.linspace(0, 2*np.pi, n_stations)
     coords = [np.array([np.cos(t)*r, np.sin(t)*r]) for t in thetas]
     return coords
-    
+
 
 if __name__ == "__main__":
     stations = get_circle_stations(20, 20)
@@ -80,11 +77,18 @@ if __name__ == "__main__":
     an1 = Annealing_EC(stations, n_iterations, x0, 5)
     samples = an1.metropolis()
     finale = samples[-1]
-    x = [stations[s][0] for s in finale]
-    y = [stations[s][1] for s in finale]
+    x = [stations[s][0] for s in finale] + [stations[finale[0]][0]]
+    y = [stations[s][1] for s in finale] + [stations[finale[0]][1]]
+
     plt.plot(x, y, "-o")
     plt.show()
     print(samples[-5:])
+
+
+    cost_matrix = np.loadtxt("exercises/day6/cost.csv", delimiter=",")
+
+    plt.matshow(cost_matrix)
+    plt.show()
 
 
 
