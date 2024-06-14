@@ -126,40 +126,6 @@ class MetropolisHastingsTwoQueues:
         
         return samples
 
-class MetropolisHastingsPosterior:
-    def __init__(self, x0: Iterable, n_iterations: int, v1: float, v2: float, sample_var: float, sample_mean: float):
-        self.x0 = x0
-        self.n_iterations = n_iterations
-        self.v1 = v1
-        self.v2 = v2
-        self.sample_mean = sample_mean
-        self.sample_var = sample_var
-
-    def h(self, x: Iterable):
-        theta = stats.norm.rvs(x[0], self.v1)
-        psi = np.exp(stats.norm.rvs(np.log(x[1]), self.v2))
-        return theta, psi
-    
-    def g(self, x: Iterable):
-        loglik = -5*np.log(2*np.pi*x[1])-1/(2*x[1])*(9*self.sample_var + 10*(self.sample_mean - x[0]))
-        logprior = -np.log(2*np.pi*x[0]*x[1]*np.sqrt(3/4)) - 2/3 * (np.log(x[0])**2-np.log(x[0])*np.log(x[1])+np.log(x[1])**2)
-        return loglik + logprior
-    
-    def metropolis(self):
-        x = self.x0
-        samples = [x]
-        for i in range(self.n_iterations-1):
-            proposal = self.h(x)
-
-            U = np.random.rand()
-
-            accept_p = np.minimum(1, self.g(proposal) / self.g(x))
-            
-            if U < accept_p:
-                x = proposal
-            
-            samples.append(x)
-        return samples
 
 
 
