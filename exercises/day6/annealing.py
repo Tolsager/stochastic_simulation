@@ -64,27 +64,57 @@ def get_circle_stations(n_stations: int, r: float):
     thetas = np.linspace(0, 2*np.pi, n_stations)
     coords = [np.array([np.cos(t)*r, np.sin(t)*r]) for t in thetas]
     return coords
+
+def get_simplex_stations(n_stations: int, max_c: float):
+    stations = []
+    while len(stations) < n_stations:
+        station = np.random.choice(max_c, 2, replace=False)
+        stations.append(station)
+    return stations
+
     
 
 if __name__ == "__main__":
-    stations = get_circle_stations(20, 20)
+    n_stations = 10
+    n_iterations = 10_000
+
+    # r = 10
+    # stations = get_circle_stations(n_stations, r)
     # x = [c[0] for c in stations]
     # y = [c[1] for c in stations]
     # plt.scatter(x, y)
     # plt.plot(x, y)
     # plt.show()
-    x0 = np.arange(20)
+    # x0 = np.arange(n_stations)
+    # np.random.shuffle(x0)
+    # print(x0)
+    # an1 = Annealing_EC(stations, n_iterations, x0, 100)
+    # samples = an1.metropolis()
+    # finale = samples[-1]
+    # finale = np.append(finale, finale[0])
+    # x = [stations[s][0] for s in finale]
+    # y = [stations[s][1] for s in finale]
+    # plt.plot(x, y, "-o")
+    # plt.show()
+    # print(samples[-5:])
+
+    max_c = 20
+    stations = get_simplex_stations(n_stations, max_c)
+    x0 = np.arange(n_stations)
     np.random.shuffle(x0)
     print(x0)
-    n_iterations = 10_000
-    an1 = Annealing_EC(stations, n_iterations, x0, 5)
-    samples = an1.metropolis()
+    T = 50
+    an2 = Annealing_EC(stations, n_iterations, x0, T)
+    samples = an2.metropolis()
     finale = samples[-1]
+    finale = np.append(finale, finale[0])
     x = [stations[s][0] for s in finale]
     y = [stations[s][1] for s in finale]
     plt.plot(x, y, "-o")
     plt.show()
-    print(samples[-5:])
+
+
+
 
 
 
