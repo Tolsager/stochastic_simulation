@@ -11,7 +11,6 @@ class Annealing:
         self.n = n
         self.T0 = T0
         self.A = A
-        self.temp = temp
 
     def h(self, x: Iterable):
         to_swap = np.random.choice(self.n, size=2, replace=False)
